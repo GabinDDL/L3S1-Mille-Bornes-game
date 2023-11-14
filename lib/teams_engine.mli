@@ -10,7 +10,6 @@ type public_informations = {
   safety_area : deck_of_card;
   coup_fouree_cards : deck_of_card;
   score : int;
-  can_drive : bool;
 }
 
 type player = Computer of (player_struct * strategy) | Human of player_struct
@@ -22,7 +21,7 @@ and strategy = {
     player ->
     public_informations ->
     public_informations list ->
-    int * int option;
+    (int * int option) option;
       (*Method that takes the player who will play (the computer),
         the public_information of the team of the same player, as well
         as a list with public_information of all other teams that play.
@@ -34,7 +33,11 @@ and strategy = {
         its own public_information it will have to use the right id (second
         argument of the function).*)
   want_to_peek_discard_pile :
-    player -> card -> public_informations -> public_informations list -> bool;
+    player ->
+    card ->
+    public_informations ->
+    public_informations list ->
+    bool option;
       (*Method that takes the player who will play (the computer),
         the card present on the top of the discard pile,
         the public_information of the team of the same player, as well as
@@ -47,7 +50,7 @@ and strategy = {
     hazard_card ->
     public_informations ->
     public_informations list ->
-    bool;
+    bool option;
       (*When a team is attacked, this method is called if the team
         can play a coup fourre. This method takes the player who will
         play (the computer), the card by which it is attacked,
@@ -94,3 +97,4 @@ val use_card : team -> card -> team
 val use_coup_fouree : team -> safety_card -> team
 val has_safety_to_counter_hazard_on_his_hand : player -> hazard_card -> bool
 val is_usable_card : public_informations -> card -> bool
+val nth_hand_player : player -> int -> card
