@@ -385,6 +385,20 @@ let test_is_empty_on_empty =
   test_case "is_empty [] = true" `Quick (fun () ->
       (check bool) "same" true (is_empty []))
 
+let test_peek_card_from_pile_on_non_empty =
+  let open QCheck in
+  Test.make ~count:1000
+    ~name:"Forall non-empty pile, peek_card_from_pile pile = List.hd pile"
+    (list arbitrary_card) (fun pile ->
+      assume (pile <> []);
+      equal_card (List.hd pile) (peek_card_from_pile pile))
+
+let test_peek_card_from_pile_on_empty =
+  let open Alcotest in
+  test_case "peek_card_from_pile [] raises Empty_pile" `Quick (fun () ->
+      check_raises "raise Empty_pile" Empty_pile (fun () ->
+          ignore (peek_card_from_pile [])))
+
 let () =
   Random.self_init ();
   let open Alcotest in
@@ -445,5 +459,10 @@ let () =
         [
           QCheck_alcotest.to_alcotest test_is_empty_on_non_empty;
           test_is_empty_on_empty;
+        ] );
+      ( "test peek_card_from_pile",
+        [
+          QCheck_alcotest.to_alcotest test_peek_card_from_pile_on_non_empty;
+          test_peek_card_from_pile_on_empty;
         ] );
     ]
